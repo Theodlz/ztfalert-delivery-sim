@@ -1,0 +1,7 @@
+**/kafka_2.13-3.4.1
+**/data
+**.tgz
+**/logs
+**/env
+**/__pycache__
+config.yaml

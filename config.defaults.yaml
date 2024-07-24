@@ -1,0 +1,9 @@
+kafka:
+  default.topic.config:
+    auto.offset.reset: "earliest"
+  group: "kowalski"
+  scala_version: "2.13"
+  kafka_version: "3.4.1"
+  bootstrap.servers: "localhost:9092"
+  zookeeper: "localhost:2181"
+  path: "kafka_2.13-3.4.1"

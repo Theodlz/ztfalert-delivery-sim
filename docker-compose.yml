@@ -1,0 +1,19 @@
+# in this docker-compose.yaml, we want to run a container with the Dockerfile in the same directory
+# and we want to expose the port 9092 to the container and map it to the port 9092 on the host
+# and pass it an environment variable called ALERTS_DATE
+version: '3'
+services:
+  ztf_kafka:
+    build: .
+    # ports:
+    #   - "9092:9092"
+    environment:
+      ALERTS_DATE: "20240715"
+      WAIT: 30 # wait time in seconds between starting kafka and producing alerts
+    volumes:
+    # bind /app/data to the data directory in the current directory
+      - ./data:/app/data
+    # share the network with the host, so we can access it via localhost
+    network_mode: "host"
+
+
