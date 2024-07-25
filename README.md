@@ -26,7 +26,11 @@ PYTHONPATH=. python ztfalertsim/consumer.py --date=YYYYMMDD
 ```
 
 ### Docker:
-To start the kafka server and stream alerts, edit the `docker-compose.yml` file to set the `ALERTS_DATE` environment variable to the desired date, and run:
+To start the kafka server and stream alerts, edit the `docker-compose.yml` file to:
+- set the `ALERTS_DATE` environment variable to the desired date in YYYYMMDD format
+- edit the volume mount for the `data` directory to point to the directory where you want to store the alert data. By default it just binds it to a `data` directory in the current directory, but you can change it to any directory or docker volume you want. The idea here is to keep on disk the alerts once downloaded, to avoid redownloading them every time you restart the container.
+
+Then run:
 ```
 docker-compose up
 ```
