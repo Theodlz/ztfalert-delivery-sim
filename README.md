@@ -47,5 +47,11 @@ To stop the kafka server and stream alerts, run:
 docker-compose down
 ```
 
+### Make it public:
+To make the kafka server publicly accessible on the internet, you'll need to:
+- open the ports, 9092, 2181, and 2888 on your system's firewall
+- open the same ports on your router and forward them to the machine running the kafka server
+- set config.yaml's `kafka.public_host` to the public IP address of the machine/router
+
 ##### Troubleshooting:
 - The `network_mode` set to `host` in the docker-compose.yml file allows us to read the kafka topic created in the container without havint to mess with the kafka server configuration. This could be changed in the future to avoid potential conflicts with other services running on the host machine.

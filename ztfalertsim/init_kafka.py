@@ -46,6 +46,10 @@ def init_kafka():
     with open(path_server_properties, "r") as f:
         server_properties = f.read()
 
+    public_host = config["kafka"].get("public_host")
+    if public_host not in ["", None, "localhost"]:
+        server_properties += f"listeners=PLAINTEXT://0.0.0.0:9092\nadvertised.listeners=PLAINTEXT://{public_host}:9092"
+    
     with open(path_kafka_config_server_properties, "w") as f:
         f.write(server_properties)
 
