@@ -77,7 +77,7 @@ class KafkaConsumer:
         count = 0
         try:
             while True:
-                msg = consumer.poll(timeout=1.0)
+                msg = consumer.poll(timeout=5.0)
                 if msg is None:
                     break
                 if msg.error():
