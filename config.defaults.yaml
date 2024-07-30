@@ -7,4 +7,4 @@ kafka:
   bootstrap.servers: "0.0.0.0:9092"
   zookeeper: "0.0.0.0:2181"
   path: "kafka_2.13-3.4.1"
-  public_host: 
+  public_host:

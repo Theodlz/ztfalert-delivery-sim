@@ -2,10 +2,9 @@ import io
 import uuid
 import time
 import numpy as np
-from ast import literal_eval
+import pathlib
 
 from fastavro import reader
-from confluent_kafka import Consumer, KafkaException, KafkaError
 
 
 from ztfalertsim.log import log
@@ -16,10 +15,17 @@ config = load_config(config_files=["config.yaml"])
 
 acai_h = ACAI_H_AlertClassifier("data/models/acai_h.d1_dnn_20201130.h5")
 
-class KafkaConsumer:
+
+
+class FakeKafkaConsumer:
     def __init__(self, date, config):
         self.topic = f"ztf_{date}_programid1"
         self.config = config
+        self.path = pathlib.Path("data") / date
+
+        # grab the full list of alert files and create an iterator
+        self.alert_files = sorted(list(self.path.glob("*.avro")))
+        self.alert_files_iter = iter(self.alert_files)
 
     @classmethod
     def decode_message(cls, msg):
@@ -29,7 +35,7 @@ class KafkaConsumer:
         :param msg: The Kafka message result from consumer.poll()
         :return:
         """
-        message = msg.value()
+        message = msg
         decoded_msg = message
 
         try:
@@ -40,36 +46,27 @@ class KafkaConsumer:
             decoded_msg = message
         finally:
             return decoded_msg
+        
+    def fetch_alert(self):
+        try:
+            alert_file = next(self.alert_files_iter)
+        except StopIteration:
+            return None
+        with open(alert_file, "rb") as f:
+            alert = f.read()
+        return alert
 
     def consume(self, max_alerts=None):
-        # load configuration
-
-        # create consumer
-        consumer = Consumer({
-            'bootstrap.servers': self.config["kafka"]["bootstrap.servers"],
-            'group.id': str(uuid.uuid1()), # generate a unique group id
-            'auto.offset.reset': 'earliest'
-        })
 
         start = time.time()
-
-        # subscribe to topic
-        consumer.subscribe([self.topic])
 
         # consume messages
         count = 0
         try:
             while True:
-                msg = consumer.poll(timeout=5.0)
+                msg = self.fetch_alert()
                 if msg is None:
                     break
-                if msg.error():
-                    if msg.error().code() == KafkaError._PARTITION_EOF:
-                        # End of partition event
-                        log('%% %s [%d] reached end at offset %d\n' %
-                            (msg.topic(), msg.partition(), msg.offset()))
-                    elif msg.error():
-                        raise KafkaException(msg.error())
                 else:
                     msg = self.decode_message(msg)
                     count += 1
@@ -176,9 +173,6 @@ class KafkaConsumer:
                     break
         except KeyboardInterrupt:
             pass
-        finally:
-            # close consumer
-            consumer.close()
 
         print(f"Processed {count} alerts in {time.time() - start} seconds")
 
@@ -202,5 +196,5 @@ if __name__ == '__main__':
     date = args.date
 
     print(f"Creating Kafka consumer for date {date}")
-    kafka_consumer = KafkaConsumer(date, config)
+    kafka_consumer = FakeKafkaConsumer(date, config)
     kafka_consumer.consume(args.max_alerts)
