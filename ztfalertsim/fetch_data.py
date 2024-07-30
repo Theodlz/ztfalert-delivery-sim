@@ -48,3 +48,32 @@ def fetch_alerts(date, path_alerts, skip_existing=False):
         os.remove(f"{tmp_dir}/ztf_public_{date}.tar.gz")
 
         print("Done!")
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Fetch ZTF alerts for a given date")
+    parser.add_argument(
+        "--date",
+        type=str,
+        help="Date for which to fetch alerts in YYYYMMDD format",
+        required=True,
+    )
+    parser.add_argument(
+        "--path-data",
+        type=str,
+        help="Path to directory where alerts should be decompressed",
+        required=False,
+        default="./data",
+    )
+    parser.add_argument(
+        "--skip-existing",
+        action="store_true",
+        help="Skip download if the directory is not empty",
+    )
+
+    args = parser.parse_args()
+
+    #path_alerts = args.path_data + "/" + args.date
+    path_alerts = os.path.join(args.path_data, args.date)
+
+    fetch_alerts(args.date, path_alerts, args.skip_existing)
