@@ -126,7 +126,7 @@ class KafkaStream:
                 "--replication-factor",
                 "1",
                 "--partitions",
-                "14",
+                "1",
                 "--topic",
                 self.topic,
             ]
